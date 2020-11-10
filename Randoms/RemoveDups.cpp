@@ -1,5 +1,6 @@
 #include <iostream>
 
+// I love every opportunity I get to use a bool array. I found the start of this on GeeksForGeeks.
 char* removeDups(char str[])
 {
     bool bin_hash[256] = { 0 };
