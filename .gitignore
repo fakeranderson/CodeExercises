@@ -1,0 +1,13 @@
+# Don't track content of these folders
+debug/
+.vs/
+
+# Visual Studio stuff
+###################
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+
+# No swaps
+*.swp
