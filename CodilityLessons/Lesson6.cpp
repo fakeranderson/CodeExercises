@@ -2,6 +2,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <map>
 namespace Lesson6
 {
 
@@ -137,7 +138,7 @@ namespace Lesson6
 
 		int answer = -1;
 		//We have no positive numbers.
-			//Minmize that answer by taking the the product of the three highest negatives
+		//Minmize that answer by taking the the product of the three highest negatives
 		if (positiveHighest == -1)
 		{
 			answer = negativeHighest * negativeSecondHighest * negativeThirdHighest;
@@ -152,11 +153,84 @@ namespace Lesson6
 		return answer;
 	}
 
+	// https://app.codility.com/programmers/lessons/6-sorting/number_of_disc_intersections/
 	int NumberOfDiscIntersections::solution(std::vector<int>& A)
 	{
+		// Give an int array of "circles" where the index is the center along the x axis and the value is the radius, 
+		// return the number of unique intersections
+		// If A[1] = 5, then the center is at point 1, the left edge is at -4, and the right edge is at 6
+		// We need to iterate across the X axis starting at the lowest left edge, ending at the highest left edge
+		// We also need to know which circles are "active" so we can tally the intersections when we reach a new left edge
+		// We can use intersection logic to sum the previous intersections with the new intersections at each index from X = 0 -> N. (I'm not a mathematition so I got a lil hint online for this one)
 
-		return 0;
+		int intersections = 0;
+		// Edge case size 0
+		if (!A.empty())
+		{
+			const unsigned int circleCount = A.size();
+			const unsigned int back = circleCount - 1;
+			std::vector<long> startPoints(circleCount, 0); // Can be negative INT32_MAX
+			std::vector<unsigned long> endPoints(circleCount, 0); // Never negative, but using an int will flip if radius is INT32_MAX
+
+			// This stores the count of start and stops of each circle at each index on the x axis, index 0 is activations <= X = 0
+			for (unsigned int i = 0; i < circleCount; ++i)
+			{
+				const unsigned int center = A[i];
+				const long leftEdge = i - A[i];
+				const unsigned long rightEdge = i + A[i];
+				if (i < center)
+				{
+					startPoints[0]++;
+				}
+				else
+				{
+					startPoints[leftEdge]++;
+				}
+
+				if (rightEdge >= circleCount)
+				{
+					endPoints[back]++;
+				}
+				else
+				{
+					endPoints[rightEdge]++;
+				}
+			}
+
+			int activeCircles = 0;
+			for (unsigned int i = 0; i < circleCount; ++i)
+			{
+				// Local vars for readability
+				const int startingCircles = startPoints[i];
+				const int endingCircles = endPoints[i];
+				// We add the intersections of the [active and starting circles] with the intersections of the [new circles]
+				// Intersections of active circles with starting circles
+				const int currentCircleIntersections = activeCircles * startingCircles;
+				
+				// Intersections of starting circles with themselves
+				// Combination equation for set size N choose 2 n*(n-1)/2 -> from n!/k!(n-k)! where k = 2
+				const int newCircleIntersections = (startingCircles * (startingCircles - 1)) / 2;
+				
+				// Now sum the combos
+				const int newIntersections = currentCircleIntersections + newCircleIntersections;
+				intersections += newIntersections;
+
+				// From problem description
+				if (intersections > 10000000)
+				{
+					intersections = -1;
+					break;
+				}
+
+				// Refresh our count of active circles
+				activeCircles += startingCircles - endingCircles;
+			}
+		}
+
+		return intersections;
 	}
+
+
 	int Triangle::solution(std::vector<int>& A)
 	{
 		return 0;

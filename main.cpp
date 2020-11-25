@@ -17,6 +17,5 @@ void print_vector(std::vector<int>& a)
 
 int main()
 {
-
 	return 0;
 }
