@@ -233,6 +233,44 @@ namespace Lesson6
 
 	int Triangle::solution(std::vector<int>& A)
 	{
-		return 0;
+		// Convert whatever we have to longs, otherwise we'll overflow max int
+		std::vector<long> B;
+		for (int i : A)
+		{
+			if(i > 0) // Skip <= 0
+				B.push_back(i);
+		}
+
+		if (B.size() < 3)
+		{
+			return 0;
+		}
+		
+		// Find if there is or not a triangle in the given vector
+		// N > R > Q > P >= 0
+		// 0 <= P < Q < R < N
+		// Condition 1: Ar + Aq > Ap
+		// Condition 2: Aq + Ap > Ar
+		// Condition 3: Ar + Ap > Aq
+
+		// Once we sort the array, condition 1 and condition 2 are always true
+		std::sort(B.begin(), B.end());
+
+		// We just need to check for condition 3, starting at the largest
+		bool triangleFound = false;
+		for (unsigned int i = B.size() - 1; i >= 2; --i) 
+		{
+			int P = B[i - 2];
+			int Q = B[i - 1];
+			int R = B[i];
+
+			if (Q + P > R)
+			{
+				triangleFound = true;
+				break;
+			}
+		}
+
+		return (int)triangleFound;
 	}
 }

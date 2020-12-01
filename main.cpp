@@ -4,9 +4,7 @@
 #include "CodilityLessons/Lesson4.h"
 #include "CodilityLessons/Lesson5.h"
 #include "CodilityLessons/Lesson6.h"
-#include <bitset>
-#include <iostream>
-#include <random>
+#include <algorithm>
 #include <iostream>
 
 void print_vector(std::vector<int>& a)
@@ -17,5 +15,6 @@ void print_vector(std::vector<int>& a)
 
 int main()
 {
+
 	return 0;
 }
