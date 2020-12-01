@@ -11,11 +11,11 @@ namespace Lesson6
 		//Given array of N integers, find unique
 		//Use a set so worst case is O(nlogn)
 		//Option 1 use a set(automatically unique) O(nlogn)
-		std::set<int> intSet;
-		for (unsigned int i = 0; i < A.size(); ++i)
-		{
-			intSet.insert(A[i]);
-		}
+		//std::set<int> intSet;
+		//for (unsigned int i = 0; i < A.size(); ++i)
+		//{
+		//	intSet.insert(A[i]);
+		//}
 
 		//Option 2 make two arrays of bools no greater than possible max int(bounds are given in problem assumptions)
 		//to lookup whether or not the number is seen or not.
