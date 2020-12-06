@@ -74,7 +74,7 @@ namespace Lesson3
 			// Now the cool part: we go through the array (again) and tally the sum (again) each time, BUT
 			// THEN we back that sum out of the ENTIRE sum, so we know the second part of the vector's sum
 			// Then take the min diff
-			for (int p = 0; p < vecSize - 1; ++p)
+			for (unsigned int p = 0; p < vecSize - 1; ++p)
 			{
 				sumFirstPart += a[p];
 				sumSecondPart = sumAllElements - sumFirstPart;

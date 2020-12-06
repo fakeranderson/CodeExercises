@@ -12,7 +12,7 @@ namespace Lesson4
 		//Use an std::set for efficiency.
 		int answer = -1;
 		std::set<int> leafPosSet;
-		for (int i = 0; i < A.size(); ++i)
+		for (unsigned int i = 0; i < A.size(); ++i)
 		{
 			//The index is the time, the value is the position of the leaf
 			leafPosSet.insert(A[i]);
@@ -84,7 +84,7 @@ namespace Lesson4
 		else if (A[0] > 1) // Missing the first number. 
 			return 1;
 
-		for (int i = 0; i < A.size(); ++i)
+		for (unsigned int i = 0; i < A.size(); ++i)
 		{
 			if (i == A.size() - 1) // If at end, next number is missing
 				return A[i] + 1;
