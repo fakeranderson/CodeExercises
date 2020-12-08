@@ -5,19 +5,24 @@
 #include <string>
 namespace AdventOfCode2020
 {
-
 	class ProblemOne
 	{
 	public:
-		static int multOfSums(std::vector<int>& A, int targetSum);
-		static int multOfThreeSums(std::vector<int>& A, int targetSum);
+		static int partOne(std::string path, int targetSum);
+		static int partTwo(std::string path, int targetSum);
 	};
 
 	class DayTwo
 	{
 	public:
-		typedef std::map<char, std::vector<std::pair<std::pair<int, int>, int>>> PasswordStructure;
 		static int partOne(std::string path);
 		static int partTwo(std::string path);
+	};
+
+	class DayThree
+	{
+	public:
+		static int partOne(std::string path);
+		static int partTwo(std::string path, std::vector<std::pair<int, int>> shiftPairs);
 	};
 }

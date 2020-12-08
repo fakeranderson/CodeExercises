@@ -5,25 +5,31 @@
 #include <fstream>
 namespace AdventOfCode2020
 {
-
-	int ProblemOne::multOfSums(std::vector<int>& A, int targetSum)
+	int ProblemOne::partOne(std::string path, int targetSum)
 	{
+		std::fstream file(path, std::ios_base::in);
+		std::vector<int> intVec;
+		int number;
+		while (file >> number)
+		{
+			intVec.push_back(number);
+		}
+
 		// Sort the array
-		std::sort(A.begin(), A.end());
+		std::sort(intVec.begin(), intVec.end());
 
 		// Use a high and low, add them each loop
 		// If the sum is over the target sum, then we need to reduce our sum, so decrement the high
 		// If the sum is under the target sum, then we need to increase our sum, so increment the low
-
 		int answer = 0;
-		unsigned int low = 0, high = (A.size() - 1);
-		unsigned int mid = A.size() / 2;
+		unsigned int low = 0, high = (intVec.size() - 1);
+		unsigned int mid = intVec.size() / 2;
 		while (low < high)
 		{
-			const int currentSum = A[low] + A[high];
+			const int currentSum = intVec[low] + intVec[high];
 			if (currentSum == targetSum)
 			{
-				answer = A[low] * A[high];
+				answer = intVec[low] * intVec[high];
 				break;
 			}
 			else if (currentSum < targetSum)
@@ -35,29 +41,35 @@ namespace AdventOfCode2020
 				--high;
 			}
 		}
-
 		return answer;
 	}
 
-	int ProblemOne::multOfThreeSums(std::vector<int>& A, int targetSum)
+	int ProblemOne::partTwo(std::string path, int targetSum)
 	{
+		std::fstream file(path, std::ios_base::in);
+		std::vector<int> intVec;
+		int number;
+		while (file >> number)
+		{
+			intVec.push_back(number);
+		}
 		// Best we can do is hash to get O(n^2)
-		const unsigned int n = A.size();
+		const unsigned int n = intVec.size();
 		int answer = 0;
 		for (unsigned int i = 0; i < n - 2; ++i)
 		{
 			std::set<int> sumSet;
-			// We have our "current" sum, aka part 1 of the triplet (A + B + C). Search for (B + C) such that when added to A it equals our target.
-			const int currentSum = targetSum - A[i];
-			for (unsigned int j = i + 1; j < n; j++)
+			// We have our "current" sum, aka part 1 of the triplet (intVec + B + C). Search for (B + C) such that when added to intVec it equals our target.
+			const int currentSum = targetSum - intVec[i];
+			for (unsigned int j = i + 1; j < n; ++j)
 			{
-				const int currentSubSum = currentSum - A[j];
+				const int currentSubSum = currentSum - intVec[j];
 				if (sumSet.find(currentSubSum) != sumSet.end())
 				{
-					answer = A[i] * A[j] * currentSubSum;
+					answer = intVec[i] * intVec[j] * currentSubSum;
 					return answer;
 				}
-				sumSet.insert(A[j]);
+				sumSet.insert(intVec[j]);
 			}
 		}
 		return answer;
@@ -66,11 +78,8 @@ namespace AdventOfCode2020
 	int DayTwo::partOne(std::string path)
 	{
 		// Given a big list of passwords and their rules, return how many passwords are valid.
-		// Password structure is a map{char][vector<min/max allowed of 'char', password string>]
-
 		std::fstream file(path, std::ios_base::in);
 		std::string line;
-		AdventOfCode2020::DayTwo::PasswordStructure ps;
 		int successes = 0;
 		// Eating one line at a time, format ##-## m: mmamammdmdmama
 		while (std::getline(file, line))
@@ -129,7 +138,6 @@ namespace AdventOfCode2020
 				successes++;
 			}
 		}
-
 		return successes;
 	}
 
@@ -137,7 +145,6 @@ namespace AdventOfCode2020
 	{
 		std::fstream file(path, std::ios_base::in);
 		std::string line;
-		AdventOfCode2020::DayTwo::PasswordStructure ps;
 		int successes = 0;
 		// Eating one line at a time, format ##-## m: mmamammdmdmama
 		while (std::getline(file, line))
@@ -167,7 +174,7 @@ namespace AdventOfCode2020
 
 			// Now grab the char that we will test against
 			char key = line[++index];
-			// No move the index to the character before the password, which will be offset by our give indices
+			// Now move the index to the character before the password, which will be offset by our give indices
 			index += 2;
 
 			// Now we have to check the two given indices. One must be the desired char, but not both
@@ -186,4 +193,55 @@ namespace AdventOfCode2020
 		return successes;
 	}
 
+
+	int DayThree::partOne(std::string path)
+	{
+		int treeCount = 0;
+		std::fstream file(path, std::ios_base::in);
+		std::vector<std::string> grid;
+		{
+			std::string line;
+			while (file >> line) // Matrix up our input file, so we can calculate the wraps easier
+			{
+				grid.push_back(line);
+			}
+		}
+		const int MAX_COLS = grid[0].size();
+		const int yShift = 3;
+		int y = 0;
+		for (std::string line : grid)
+		{
+			treeCount += (int)(line[y] == '#');
+			y = ((y + yShift) % MAX_COLS);
+		}
+		return treeCount;
+	}
+
+	int DayThree::partTwo(std::string path, std::vector<std::pair<int, int>> shiftPairs)
+	{
+		int treeCountsProduct = 1;
+		std::fstream file(path, std::ios_base::in);
+		std::vector<std::string> grid;
+		std::string line;
+		while (file >> line) // Matrix up our input file, so we can calculate the wraps easier
+		{
+			grid.push_back(line);
+		}
+		const unsigned int MAX_ROWS = grid.size();
+		const unsigned int MAX_COLS = grid[0].size();
+		for (unsigned int pairIdx = 0; pairIdx < shiftPairs.size(); ++pairIdx)
+		{
+			int treeCount = 0;
+			const int xShift = shiftPairs[pairIdx].first;
+			const int yShift = shiftPairs[pairIdx].second;
+			unsigned int y = 0;
+			for (unsigned int x = 0; x < MAX_ROWS; x += xShift)
+			{
+				treeCount += (int)(grid[x][y] == '#');
+				y = ((y + yShift) % MAX_COLS);
+			}
+			treeCountsProduct *= treeCount;
+		}
+		return treeCountsProduct;
+	}
 }
