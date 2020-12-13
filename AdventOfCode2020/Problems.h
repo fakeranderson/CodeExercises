@@ -43,4 +43,11 @@ namespace AdventOfCode2020
 		static int partOne(std::string path);
 		static int partTwo(std::string path);
 	};
+
+	class DaySix
+	{
+	public:
+		static int partOne(std::string path);
+		static int partTwo(std::string path);
+	};
 }

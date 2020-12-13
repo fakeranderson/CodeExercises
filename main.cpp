@@ -40,5 +40,8 @@ int main()
 	// Day Five
 	answer = AdventOfCode2020::DayFive::partOne("AdventOfCode2020\\InputFiles\\5-1.txt");
 	answer = AdventOfCode2020::DayFive::partTwo("AdventOfCode2020\\InputFiles\\5-1.txt"); // Same input file
+
+	answer = AdventOfCode2020::DaySix::partOne("AdventOfCode2020\\InputFiles\\6-1.txt");
+	answer = AdventOfCode2020::DaySix::partTwo("AdventOfCode2020\\InputFiles\\6-1.txt");
 	return 0;
 }

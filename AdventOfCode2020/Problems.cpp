@@ -5,6 +5,7 @@
 #include <fstream>
 #include <regex>
 #include <bitset>
+#include <map>
 
 namespace AdventOfCode2020
 {
@@ -281,7 +282,7 @@ namespace AdventOfCode2020
 				// byr - must be 4 digits between 1920 and 2002
 				isValid &= (passportIt->find("byr") != passportIt->end())
 					&& std::regex_search(passportIt->find("byr")->second.cbegin(), passportIt->find("byr")->second.cend(), std::regex("^\\d{4}$")) // 4 digits 
-					&& ((std::stoi(passportIt->find("byr")->second) >= 1920) && (std::stoi(passportIt->find("byr")->second) <= 2002)); 
+					&& ((std::stoi(passportIt->find("byr")->second) >= 1920) && (std::stoi(passportIt->find("byr")->second) <= 2002));
 				// iry - between 2010 & 2020
 				isValid &= (passportIt->find("iyr") != passportIt->end())
 					&& std::regex_search(passportIt->find("iyr")->second.cbegin(), passportIt->find("iyr")->second.cend(), std::regex("^\\d{4}$")) // 4 digits 
@@ -291,14 +292,14 @@ namespace AdventOfCode2020
 					&& std::regex_search(passportIt->find("eyr")->second.cbegin(), passportIt->find("eyr")->second.cend(), std::regex("^\\d{4}$")) // 4 digits 
 					&& ((std::stoi(passportIt->find("eyr")->second) >= 2020) && (std::stoi(passportIt->find("eyr")->second) <= 2030));
 				// hgt - number followed by "cm" or "in"
-				isValid &= ( (passportIt->find("hgt") != passportIt->end()) && isHeightValid(passportIt->find("hgt")->second) );
+				isValid &= ((passportIt->find("hgt") != passportIt->end()) && isHeightValid(passportIt->find("hgt")->second));
 				// hcl - a # followed by exactly six characters 0-9 or a-f
-				isValid &= (passportIt->find("hcl") != passportIt->end()) 
+				isValid &= (passportIt->find("hcl") != passportIt->end())
 					&& std::regex_search(passportIt->find("hcl")->second.cbegin(), passportIt->find("hcl")->second.cend(), std::regex("^#[a-f0-9]{6}$"));
 				// ecl - exactly one of: amb blu brn gry grn hzl oth
 				isValid &= (passportIt->find("ecl") != passportIt->end()) && (isEyeColorValid(passportIt->find("ecl")->second));
 				// a nine digit number, including leading zeroes
-				isValid &= (passportIt->find("pid") != passportIt->end()) 
+				isValid &= (passportIt->find("pid") != passportIt->end())
 					&& std::regex_search(passportIt->find("pid")->second.cbegin(), passportIt->find("pid")->second.cend(), std::regex("^\\d{9}$"));
 			}
 			else
@@ -345,7 +346,7 @@ namespace AdventOfCode2020
 	{
 		bool isValid = false;
 		std::smatch matches;
-		if(std::regex_search(heightString.cbegin(), heightString.cend(), matches, std::regex("^([0-9]*)(in|cm)$") ) )
+		if (std::regex_search(heightString.cbegin(), heightString.cend(), matches, std::regex("^([0-9]*)(in|cm)$")))
 		{
 			const std::string unit = matches[2];
 			const int height = std::stoi(matches[1]);
@@ -440,5 +441,79 @@ namespace AdventOfCode2020
 			}
 		}
 		return mySeat;
+	}
+	int DaySix::partOne(std::string path)
+	{
+		std::fstream file(path, std::ios_base::in);
+		std::string line;
+		std::set<char> answerCounts;
+		int totalUniques = 0;
+		while (std::getline(file, line))
+		{
+			if (line.empty()) // Done collecting a group, store the answers
+			{
+				totalUniques += answerCounts.size();
+				answerCounts.clear();
+			}
+			else
+			{
+				// Throw all the letters into a set.
+				for (char answerLetter : line)
+				{
+					answerCounts.insert(answerLetter);
+				}
+			}
+		}
+		return totalUniques;
+	}
+	int DaySix::partTwo(std::string path)
+	{
+		std::fstream file(path, std::ios_base::in);
+		std::string line;
+		// Everyone in the group must share a common answer for it to count.
+		std::set<char> personAnswers;
+		std::map<int, std::set<char>> groupAnswers;
+		int group = 0, person = 0;
+		int totalUniques = 0;
+		while (std::getline(file, line))
+		{
+			if (line.empty()) // Done collecting a group, store the answers
+			{
+				// If every person in this group shares a letter, store it.
+				int sharedYeses = 0;
+				for (char letter = 'a'; letter <= 'z'; ++letter)
+				{
+					bool agreedAnswer = true;
+					for (auto personIt : groupAnswers)
+					{
+						agreedAnswer &= personIt.second.find(letter) != personIt.second.end();
+					}
+					if (agreedAnswer)
+					{
+						++sharedYeses;
+					}
+
+				}
+				// Accumulate the number total shared letters 
+				totalUniques += sharedYeses;
+				// Reset our counters
+				person = 0;
+				groupAnswers.clear();
+				personAnswers.clear();
+			}
+			else
+			{
+				// New person, log their yeses
+				for (char yes : line)
+				{
+					personAnswers.insert(yes);
+				}
+				// Finished logging this persons yeses, store it in the map
+				groupAnswers[person] = personAnswers;
+				personAnswers.clear();
+				++person;
+			}
+		}
+		return totalUniques;
 	}
 }
