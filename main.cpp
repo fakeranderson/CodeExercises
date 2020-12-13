@@ -33,5 +33,12 @@ int main()
 	std::vector<std::pair<int, int>> shiftPairs = { {1, 1}, {1, 3}, {1, 5}, {1, 7}, {2, 1} }; // From 3-2 web page
 	answer = AdventOfCode2020::DayThree::partTwo("AdventOfCode2020\\InputFiles\\3-2.txt", shiftPairs);
 
+	// Day Four
+	answer = AdventOfCode2020::DayFour::partOne("AdventOfCode2020\\InputFiles\\4-1.txt");
+	answer = AdventOfCode2020::DayFour::partTwo("AdventOfCode2020\\InputFiles\\4-2.txt");
+
+	// Day Five
+	answer = AdventOfCode2020::DayFive::partOne("AdventOfCode2020\\InputFiles\\5-1.txt");
+	answer = AdventOfCode2020::DayFive::partTwo("AdventOfCode2020\\InputFiles\\5-1.txt"); // Same input file
 	return 0;
 }

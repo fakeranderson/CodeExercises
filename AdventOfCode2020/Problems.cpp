@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <set>
 #include <fstream>
+#include <regex>
+#include <bitset>
+
 namespace AdventOfCode2020
 {
 	int ProblemOne::partOne(std::string path, int targetSum)
@@ -243,5 +246,199 @@ namespace AdventOfCode2020
 			treeCountsProduct *= treeCount;
 		}
 		return treeCountsProduct;
+	}
+	int DayFour::partOne(std::string path)
+	{
+		int validCount = 0;
+		std::vector<std::map<std::string, std::string>> passportVector = makePassportVector(path);
+		const int MAX_PASSPORT_FIELDS = 8;
+		for (auto passport : passportVector)
+		{
+			// Now check our success conditions
+			if (passport.size() == MAX_PASSPORT_FIELDS ||
+				((passport.size() == (MAX_PASSPORT_FIELDS - 1)) && (passport.find("cid") == passport.end())))
+			{
+				validCount++;
+			}
+		}
+		return validCount;
+	}
+
+	int DayFour::partTwo(std::string path)
+	{
+		int validCount = 0;
+		std::vector<std::map<std::string, std::string>> passportVector = makePassportVector(path);
+		const int MAX_PASSPORT_FIELDS = 8;
+
+		// Go through one passport at a time
+		for (auto passportIt = passportVector.begin(); passportIt != passportVector.end(); ++passportIt)
+		{
+			bool isValid = true;
+			if (passportIt->size() == MAX_PASSPORT_FIELDS || // If we have all the fields
+				((passportIt->size() == (MAX_PASSPORT_FIELDS - 1)) && (passportIt->find("cid") == passportIt->end()))) // If we're missing ONLY cid
+			{
+				// Data validation
+				// byr - must be 4 digits between 1920 and 2002
+				isValid &= (passportIt->find("byr") != passportIt->end())
+					&& std::regex_search(passportIt->find("byr")->second.cbegin(), passportIt->find("byr")->second.cend(), std::regex("^\\d{4}$")) // 4 digits 
+					&& ((std::stoi(passportIt->find("byr")->second) >= 1920) && (std::stoi(passportIt->find("byr")->second) <= 2002)); 
+				// iry - between 2010 & 2020
+				isValid &= (passportIt->find("iyr") != passportIt->end())
+					&& std::regex_search(passportIt->find("iyr")->second.cbegin(), passportIt->find("iyr")->second.cend(), std::regex("^\\d{4}$")) // 4 digits 
+					&& ((std::stoi(passportIt->find("iyr")->second) >= 2010) && (std::stoi(passportIt->find("iyr")->second) <= 2020));
+				// eyr - between 2020 & 2030
+				isValid &= (passportIt->find("eyr") != passportIt->end())
+					&& std::regex_search(passportIt->find("eyr")->second.cbegin(), passportIt->find("eyr")->second.cend(), std::regex("^\\d{4}$")) // 4 digits 
+					&& ((std::stoi(passportIt->find("eyr")->second) >= 2020) && (std::stoi(passportIt->find("eyr")->second) <= 2030));
+				// hgt - number followed by "cm" or "in"
+				isValid &= ( (passportIt->find("hgt") != passportIt->end()) && isHeightValid(passportIt->find("hgt")->second) );
+				// hcl - a # followed by exactly six characters 0-9 or a-f
+				isValid &= (passportIt->find("hcl") != passportIt->end()) 
+					&& std::regex_search(passportIt->find("hcl")->second.cbegin(), passportIt->find("hcl")->second.cend(), std::regex("^#[a-f0-9]{6}$"));
+				// ecl - exactly one of: amb blu brn gry grn hzl oth
+				isValid &= (passportIt->find("ecl") != passportIt->end()) && (isEyeColorValid(passportIt->find("ecl")->second));
+				// a nine digit number, including leading zeroes
+				isValid &= (passportIt->find("pid") != passportIt->end()) 
+					&& std::regex_search(passportIt->find("pid")->second.cbegin(), passportIt->find("pid")->second.cend(), std::regex("^\\d{9}$"));
+			}
+			else
+			{
+				isValid = false;
+			}
+
+			validCount += (int)isValid;
+		}
+		return validCount;
+	}
+
+	std::vector<std::map<std::string, std::string>> DayFour::makePassportVector(std::string path)
+	{
+		std::fstream file(path, std::ios_base::in);
+		std::string line;
+		std::vector<std::map<std::string, std::string>> passportVector;
+		std::map<std::string, std::string> passport;
+
+		std::regex keyValueRegex("(...):(\\S*)");
+		std::smatch matches;
+
+		while (std::getline(file, line))
+		{
+			if (line.empty()) // End of passport matching, push back what the deets and clear it for reuse
+			{
+				passportVector.push_back(passport);
+				passport.clear();
+			}
+
+			std::string::const_iterator searchStart(line.cbegin());
+			while (std::regex_search(searchStart, line.cend(), matches, keyValueRegex))
+			{
+				std::string key = matches[1];
+				std::string value = matches[2];
+				passport[key] = value;
+				searchStart = matches.suffix().first;
+			}
+		}
+		return passportVector;
+	}
+
+	bool DayFour::isHeightValid(std::string heightString)
+	{
+		bool isValid = false;
+		std::smatch matches;
+		if(std::regex_search(heightString.cbegin(), heightString.cend(), matches, std::regex("^([0-9]*)(in|cm)$") ) )
+		{
+			const std::string unit = matches[2];
+			const int height = std::stoi(matches[1]);
+			if (unit == "in")
+			{
+				isValid = height >= 59 && height <= 76;
+			}
+			else if (unit == "cm")
+			{
+				isValid = height >= 150 && height <= 193;
+			}
+		}
+		return isValid;
+	}
+
+	// exactly one of: amb blu brn gry grn hzl oth
+	bool DayFour::isEyeColorValid(std::string eyeColorString)
+	{
+		return (eyeColorString == "amb")
+			|| (eyeColorString == "blu")
+			|| (eyeColorString == "brn")
+			|| (eyeColorString == "gry")
+			|| (eyeColorString == "grn")
+			|| (eyeColorString == "hzl")
+			|| (eyeColorString == "oth");
+	}
+
+	int DayFive::partOne(std::string path)
+	{
+		std::fstream file(path, std::ios_base::in);
+		std::string line;
+		int maxSeatId = 0;
+		while (file >> line)
+		{
+			std::bitset<7> rowBitset;
+			int lineIdx = 6;
+			for (int bitIdx = 0; bitIdx < 7; ++bitIdx)
+			{
+				rowBitset[bitIdx] = (int)(line[lineIdx--] == 'B');
+			}
+			int row = (int)rowBitset.to_ulong();
+
+			std::bitset<3> colBitset;
+			lineIdx = 9;
+			for (int bitIdx = 0; bitIdx < 3; ++bitIdx)
+			{
+				colBitset[bitIdx] = (int)(line[lineIdx--] == 'R');
+			}
+			int col = colBitset.to_ulong();
+
+			int seatId = (row * 8) + col;
+			maxSeatId = std::max(seatId, maxSeatId);
+		}
+		return maxSeatId;
+	}
+
+	int DayFive::partTwo(std::string path)
+	{
+		std::fstream file(path, std::ios_base::in);
+		std::string line;
+		std::set<int> occupancyList;
+		while (file >> line)
+		{
+			std::bitset<7> rowBitset;
+			int lineIdx = 6;
+			for (int bitIdx = 0; bitIdx < 7; ++bitIdx)
+			{
+				rowBitset[bitIdx] = (int)(line[lineIdx--] == 'B');
+			}
+			int row = (int)rowBitset.to_ulong();
+
+			std::bitset<3> colBitset;
+			lineIdx = 9;
+			for (int bitIdx = 0; bitIdx < 3; ++bitIdx)
+			{
+				colBitset[bitIdx] = (int)(line[lineIdx--] == 'R');
+			}
+			int col = colBitset.to_ulong();
+
+			int seatId = (row * 8) + col;
+			occupancyList.insert(seatId);
+		}
+		// Ok this part is bullshit. Just literally find the missing seat from the list of all seats. 
+		// There was some mumbo jumbo in the problem about how seats are missing from the front and back of the aircraft.. whatever ok. 
+		int mySeat = 0;
+		for (auto prevSeatIt = occupancyList.begin(), seatIt = std::next(occupancyList.begin()); seatIt != occupancyList.end(); ++seatIt, ++prevSeatIt)
+		{
+			const int currentSeat = *seatIt, previousSeat = *prevSeatIt;
+			if ((previousSeat + 1) != currentSeat)
+			{
+				mySeat = previousSeat + 1;
+			}
+		}
+		return mySeat;
 	}
 }
