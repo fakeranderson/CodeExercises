@@ -1,12 +1,6 @@
-#include "CodilityLessons/Lesson1.h"
-#include "CodilityLessons/Lesson2.h"
-#include "CodilityLessons/Lesson3.h"
-#include "CodilityLessons/Lesson4.h"
-#include "CodilityLessons/Lesson5.h"
-#include "CodilityLessons/Lesson6.h"
+#include "CodilityLessons/Lessons.h"
 #include "AdventOfCode2020/Problems.h"
 
-#include "Utilities.h"
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -43,5 +37,8 @@ int main()
 
 	answer = AdventOfCode2020::DaySix::partOne("AdventOfCode2020\\InputFiles\\6-1.txt");
 	answer = AdventOfCode2020::DaySix::partTwo("AdventOfCode2020\\InputFiles\\6-1.txt");
+
+	answer = AdventOfCode2020::DayEight::partOne("AdventOfCode2020\\InputFiles\\8-1.txt");
+	answer = AdventOfCode2020::DayEight::partTwo("AdventOfCode2020\\InputFiles\\8-1.txt");
 	return 0;
 }

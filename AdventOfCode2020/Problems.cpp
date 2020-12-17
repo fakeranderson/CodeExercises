@@ -6,6 +6,9 @@
 #include <regex>
 #include <bitset>
 #include <map>
+#include <unordered_set>
+#include <unordered_map>
+#include <functional>
 
 namespace AdventOfCode2020
 {
@@ -515,5 +518,85 @@ namespace AdventOfCode2020
 			}
 		}
 		return totalUniques;
+	}
+
+	int DaySeven::partOne(std::string path)
+	{
+		const std::string targetBag = "shiny gold";
+		std::regex parentBag("^(\\D*) bags");
+		std::regex childBags("(\\d) (\\D*) bags?"); // Don't really need s? but lets be safe
+		std::smatch matches;
+		std::fstream file(path, std::ios_base::in);
+		std::string line;
+		std::map<std::string, std::vector<std::string>> rulesMap;
+		while (std::getline(file, line))
+		{
+			auto start_search = line.cbegin();
+			// Get the first bag in the sentence
+			std::regex_search(line.cbegin(), line.cend(), matches, parentBag);
+			std::string parentBag = matches[1];
+			start_search = matches.suffix().first; // Move to next
+			while (std::regex_search(start_search, line.cend(), matches, childBags))
+			{
+				rulesMap[parentBag].push_back(matches[2]);
+				start_search = matches.suffix().first;
+			}
+		}
+		return 0;
+	}
+
+	int DaySeven::partTwo(std::string path)
+	{
+		return 0;
+	}
+	int DayEight::partOne(std::string path)
+	{
+		std::regex instructionPattern("^(...) (\\+|\\-)(\\d*)$");
+		std::smatch matches;
+		std::fstream file(path, std::ios_base::in);
+		std::string line;
+		std::vector<std::tuple<std::string, int, bool>> instructions;
+		while (std::getline(file, line))
+		{
+			auto start_search = line.cbegin();
+			while (std::regex_search(start_search, line.cend(), matches, instructionPattern))
+			{
+				const std::string instruction = matches[1];
+				const int value = matches[2] == "+" ? std::stoi(matches[3]) : (std::stoi(matches[3]) * -1);
+				instructions.push_back(std::make_tuple(instruction, value, false));
+				start_search = matches.suffix().first;
+			}
+		}
+
+		int accumulator = 0;
+		// Now execute the "program"
+		unsigned int i = 0;
+		while (!(std::get<2>(instructions[i])))
+		{
+			std::get<2>(instructions[i]) = true;
+			const std::string instruction = std::get<0>(instructions[i]);
+			const int value = std::get<1>(instructions[i]);
+			if (instruction == "acc") // if add
+			{
+				accumulator += value;
+				++i;
+			}
+			else if (instruction == "jmp")
+			{
+				i += value;
+			}
+			else // nop
+			{
+				++i;
+			}
+		}
+
+		return accumulator;
+	}
+
+	int DayEight::partTwo(std::string path)
+	{
+
+		return 0;
 	}
 }
