@@ -732,3 +732,69 @@ namespace CodilityLessons
 	}
 
 }
+
+int CodilityLessons::Lesson7::Brackets::solution(std::string& S)
+{
+	// First check instant fails
+	const int backIndex = S.size() - 1;
+	if ((S[0] == ')' || S[0] == ']' || S[0] == '}')
+		|| (S[backIndex] == '(' || S[backIndex] == '[' || S[backIndex] == '{'))
+	{
+		return 0;
+	}
+	int answer = 1;
+	std::vector<char> openChars;
+	for (char character : S)
+	{
+		if (character == '{'
+			|| character == '['
+			|| character == '(')
+		{
+			openChars.push_back(character);
+		}
+		else
+		{
+			if (character == ']')
+			{
+				if (openChars.back() == '[') // We're good, pop it off the back and continue
+				{
+					openChars.pop_back();
+				}
+				else
+				{
+					answer = 0;
+					break;
+				}
+			}
+			else if (character == '}')
+			{
+				if (openChars.back() == '{') // We're good, pop it off the back and continue
+				{
+					openChars.pop_back();
+				}
+				else
+				{
+					answer = 0;
+					break;
+				}
+			}
+			else if (character == ')')
+			{
+				if (openChars.back() == '(') // We're good, pop it off the back and continue
+				{
+					openChars.pop_back();
+				}
+				else
+				{
+					answer = 0;
+					break;
+				}
+			}
+		}
+	}
+	if (!openChars.empty())
+	{
+		answer = 0;
+	}
+	return answer;
+}

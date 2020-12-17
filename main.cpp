@@ -40,5 +40,8 @@ int main()
 
 	answer = AdventOfCode2020::DayEight::partOne("AdventOfCode2020\\InputFiles\\8-1.txt");
 	answer = AdventOfCode2020::DayEight::partTwo("AdventOfCode2020\\InputFiles\\8-1.txt");
+
+	std::string bracketString = "()(()()(((()())(()())";
+	answer = CodilityLessons::Lesson7::Brackets::solution(bracketString);
 	return 0;
 }

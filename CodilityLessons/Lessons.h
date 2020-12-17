@@ -125,4 +125,13 @@ namespace Lesson6
 	};
 }
 
+namespace Lesson7
+{
+	class Brackets
+	{
+	public:
+		static int solution(std::string& S);
+	};
+}
+
 }
